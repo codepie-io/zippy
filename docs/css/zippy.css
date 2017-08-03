@@ -1,0 +1,1 @@
+.zippy{overflow:hidden}.zippy__wrapper{visibility:hidden}.zippy--animating .zippy__wrapper{transition-duration:.3s;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-property:margin}.zippy--open .zippy__wrapper{visibility:visible}

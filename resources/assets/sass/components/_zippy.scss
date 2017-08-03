@@ -1,0 +1,22 @@
+@import "../mixins/mixins";
+
+.zippy{
+  overflow: hidden;
+
+  &__wrapper {
+    visibility: hidden;
+  }
+
+  &--animating{
+    .zippy__wrapper {
+      @include material-animation-default(.3s);
+      transition-property: margin;
+    }
+  }
+
+  &--open {
+    .zippy__wrapper{
+      visibility: visible;
+    }
+  }
+}

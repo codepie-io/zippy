@@ -39,48 +39,66 @@
       IS_ANIMATING: 'zippy--animating'
     }
 
+    Zippy.prototype.Constant_ = {
+      TRANSITION_DURATION_SECONDS: 0.3,
+      CLOSE_TIMEOUT: 400,
+      TINY_TIMEOUT: 1
+    };
+
     Zippy.prototype.init = function (config) {
       if(this.$zippy_.length){
         this.config = $.extend({}, this.Default, config)
         this.$zippyWrapper_ = this.$zippy_.find('.'+this.Classes_.ZIPPY_WRAPPER)
-        let rect = this.$zippyWrapper.get(0).getBoundingClientRect();
+        let rect = this.$zippyWrapper_.get(0).getBoundingClientRect();
         this.$zippyWrapper_.css('margin-top',-rect.height);
         this.currentMargin = rect.height;
         this.boundOnTransitionEnd_ = this.onTransitionEnd_.bind(this)
+        this.boundOnWindowResize_ = this.update.bind(this)
+        $(window).on('resize', this.boundOnWindowResize_)
       }
     }
 
     Zippy.prototype.show = function () {
       this.$zippy_.addClass(this.Classes_.IS_ANIMATING).addClass(this.Classes_.IS_OPEN)
-      this.$zippy_.trigger(Event.SHOW)
+      this.$zippyWrapper_.on('transitionend', this.boundOnTransitionEnd_)
       this.isShown_ = true
       this.isAnimating_ = true
       this.$zippyWrapper_.css('margin-top','0');
       this.$zippy_.attr('aria-expanded', 'true');
-      this.$zippyWrapper_.on('transitionend', this.boundOnTransitionEnd_)
     }
 
     Zippy.prototype.hide = function () {
-      this.$zippy_.addClass(this.Classes_.IS_ANIMATING).addClass(this.Classes_.IS_OPEN)
-      this.$zippy_.trigger(Event.SHOW)
+      this.$zippy_.addClass(this.Classes_.IS_ANIMATING)
+      this.$zippyWrapper_.on('transitionend', this.boundOnTransitionEnd_)
+      this.$zippy_.trigger(Event.HIDE)
       this.isShown_ = false
       this.isAnimating_ = true
       this.$zippyWrapper_.css('margin-top',-this.currentMargin);
-      this.$zippy_.attr('aria-expanded', 'true');
-      this.$zippyWrapper_.on('transitionend', this.boundOnTransitionEnd_)
+      this.$zippy_.attr('aria-expanded', 'false');
     }
 
     Zippy.prototype.toggle = function () {
-      if(this.isAnimating_)
-          return
-      this.isShown_? this.hide() : this.show()
+      this.$zippy_.hasClass(this.Classes_.IS_OPEN) && this.isShown_ ? this.hide() : this.show()
+    }
+
+    Zippy.prototype.update = function () {
+      let rect = this.$zippyWrapper_.get(0).getBoundingClientRect();
+      this.currentMargin = rect.height
+      if(this.isShown_)
+      this.$zippyWrapper_.css('margin-top',-rect.height);
     }
 
     Zippy.prototype.onTransitionEnd_ = function () {
+      this.$zippyWrapper_.unbind('transitionend',this.boundOnTransitionEnd_)
       this.$zippy_.removeClass(this.Classes_.IS_ANIMATING)
       this.isAnimating_ = false
-      this.$zippyWrapper_.unbind('transitionend',this.boundOnTransitionEnd_)
-      this.isShown_?this.$zippy_.trigger(Event.SHOWN):this.$zippy_.trigger(Event.HIDDEN)
+      if(this.isShown_){
+        this.$zippy_.trigger(Event.SHOWN)
+      }
+      else{
+        this.$zippy_.removeClass(this.Classes_.IS_OPEN)
+        this.$zippy_.trigger(Event.HIDDEN)
+      }
     }
 
     Zippy.Plugin_ = function Plugin_(config) {
@@ -119,6 +137,7 @@
     var config = $(target).data(DATA_KEY) ? 'toggle' : $.extend({}, $(target).data(), $(this).data())
     Zippy.Plugin_.call($(target), config)
   })
+
   $.fn.Zippy = Zippy.Plugin_
   $.fn.Zippy.Constructor = Zippy
   $.fn.Zippy.noConflict = function () {

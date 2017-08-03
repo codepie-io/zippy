@@ -42,9 +42,33 @@
     </div>
 </header>
 
-
+<section class="zippy suggestion-list-expand" id="expand-1">
+    <div class="zippy__wrapper">
+        <div class="suggestion-list">
+            <a href="javascript;" class="md-button suggestion-list__item">
+                <span class="query-text">amazon</span>
+            </a>
+            <a href="javascript;" class="md-button suggestion-list__item">
+                <span class="query-text">flipkart</span>
+            </a>
+            <a href="javascript;" class="md-button suggestion-list__item">
+                <span class="query-text">snapdeal</span>
+            </a>
+        </div>
+    </div>
+</section>
+<div class="layout-m-t-2 text-center">
+    <button class="md-button md-button--primary md-button--raised" data-toggle="zippy" data-target="#expand-1">
+        Toggle zippy
+    </button>
+</div>
 
 <script src="js/jquery.js"></script>
 <script src="js/zippy.js"></script>
+<script>
+    $(document).ready(function(){
+        $('#expand-1').Zippy();
+    })
+</script>
 </body>
 </html>
